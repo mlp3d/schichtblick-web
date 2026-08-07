@@ -63,7 +63,7 @@ header.top .name {
 }
 
 header.top .name .plus {
-  color: #2F6BFF;
+  color: var(--accent);
 }
 
 nav.pages {
