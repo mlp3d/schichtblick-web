@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schichtblick — App laden</title>
+<link rel="stylesheet" href="style.css">
+<script>
+// Weiche fuer den QR-Code aus den Videos: ein Code, der auf beiden Systemen
+// im richtigen Store landet. Wer am Rechner sitzt oder wo die Erkennung
+// danebengreift, sieht unten einfach beide Schaltflaechen.
+(function () {
+  var ua = navigator.userAgent || '';
+  var apple = /iPhone|iPad|iPod/i.test(ua) ||
+    (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var android = /Android/i.test(ua);
+  var ziel = apple
+    ? 'https://apps.apple.com/de/app/schichtblick-dienstplan/id6799117859'
+    : android
+      ? 'https://play.google.com/store/apps/details?id=de.mlp3d.schichtblick'
+      : null;
+  if (ziel) location.replace(ziel);
+})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">S</div>
+    <div class="name">Schichtblick<span class="plus">+</span></div>
+  </header>
+
+  <h1>Schichtblick: Dienstplan</h1>
+  <p>Die App für Schichtarbeiter. Auf dem Handy öffnet sich der passende Store von selbst. Falls nicht, hier entlang:</p>
+
+  <p>
+    <a href="https://apps.apple.com/de/app/schichtblick-dienstplan/id6799117859">Im App Store laden</a><br>
+    <a href="https://play.google.com/store/apps/details?id=de.mlp3d.schichtblick">Bei Google Play laden</a>
+  </p>
+
+  <nav class="pages">
+    <a href="index.html">Support</a>
+    <a href="datenschutz.html">Datenschutzerklärung</a>
+    <a href="nutzungsbedingungen.html">Nutzungsbedingungen</a>
+    <a href="impressum.html">Impressum</a>
+  </nav>
+</div>
+</body>
+</html>
