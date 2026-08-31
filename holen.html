@@ -9,17 +9,62 @@
 // Weiche fuer den QR-Code aus den Videos: ein Code, der auf beiden Systemen
 // im richtigen Store landet. Wer am Rechner sitzt oder wo die Erkennung
 // danebengreift, sieht unten einfach beide Schaltflaechen.
+//
+// Der Aufruf kennt einen Parameter `von`, der zwei Dinge steuert:
+//
+//   holen.html                 wie bisher: weiterleiten, keine Kampagne
+//   holen.html?von=video-01    weiterleiten, Kampagne sb-video-01
+//   holen.html?von=bio-tiktok  KEINE Weiterleitung, Kampagne sb-bio-tiktok
+//
+// Warum aus der Bio nicht weitergeleitet wird: das Website-Feld des
+// TikTok-Profils traegt das Impressum (§ 5 DDG). Eine Seite, die sofort in den
+// Store springt, macht das Impressum unerreichbar. Der QR-Code aus den Videos
+// behaelt die Weiterleitung, dort ist sie richtig.
 (function () {
+  // Apples Anbieterkennung aus App Store Connect. Sie ist fuer alle Links
+  // dieselbe und steht in jedem dort erzeugten Campaign Link als `pt=`.
+  // Solange sie leer ist, gehen die Apple-Links bewusst OHNE Kampagne raus:
+  // eine geratene Kennung waere schlimmer als gar keine.
+  var APPLE_PT = '';
+
+  var APPLE = 'https://apps.apple.com/de/app/schichtblick-dienstplan/id6799117859';
+  var PLAY = 'https://play.google.com/store/apps/details?id=de.mlp3d.schichtblick';
+
+  var von = ((location.search.match(/[?&]von=([a-zA-Z0-9-]{1,24})/) || [])[1] || '').toLowerCase();
+  var kampagne = von ? ('sb-' + von).slice(0, 30) : '';
+  var ausBio = von.indexOf('bio') === 0;
+  var plattform = (von.match(/tiktok|instagram|youtube/) || [])[0] || 'link';
+
+  var appleZiel = (kampagne && APPLE_PT)
+    ? APPLE + '?pt=' + encodeURIComponent(APPLE_PT) + '&ct=' + encodeURIComponent(kampagne) + '&mt=8'
+    : APPLE;
+
+  var playZiel = kampagne
+    ? PLAY + '&referrer=' + encodeURIComponent(
+        'utm_source=' + plattform + '&utm_medium=social&utm_campaign=' + kampagne)
+    : PLAY;
+
   var ua = navigator.userAgent || '';
   var apple = /iPhone|iPad|iPod/i.test(ua) ||
     (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   var android = /Android/i.test(ua);
-  var ziel = apple
-    ? 'https://apps.apple.com/de/app/schichtblick-dienstplan/id6799117859'
-    : android
-      ? 'https://play.google.com/store/apps/details?id=de.mlp3d.schichtblick'
-      : null;
-  if (ziel) location.replace(ziel);
+
+  if (!ausBio) {
+    var ziel = apple ? appleZiel : android ? playZiel : null;
+    if (ziel) { location.replace(ziel); return; }
+  }
+
+  // Die beiden Schaltflaechen tragen dieselbe Kampagne wie die Weiterleitung.
+  document.addEventListener('DOMContentLoaded', function () {
+    var a = document.getElementById('apple');
+    var p = document.getElementById('play');
+    if (a) a.href = appleZiel;
+    if (p) p.href = playZiel;
+    if (ausBio) {
+      var t = document.getElementById('vorspann');
+      if (t) t.textContent = 'Die App für Schichtarbeiter. Wähl deinen Store:';
+    }
+  });
 })();
 </script>
 </head>
@@ -31,11 +76,11 @@
   </header>
 
   <h1>Schichtblick: Dienstplan</h1>
-  <p>Die App für Schichtarbeiter. Auf dem Handy öffnet sich der passende Store von selbst. Falls nicht, hier entlang:</p>
+  <p id="vorspann">Die App für Schichtarbeiter. Auf dem Handy öffnet sich der passende Store von selbst. Falls nicht, hier entlang:</p>
 
   <p>
-    <a href="https://apps.apple.com/de/app/schichtblick-dienstplan/id6799117859">Im App Store laden</a><br>
-    <a href="https://play.google.com/store/apps/details?id=de.mlp3d.schichtblick">Bei Google Play laden</a>
+    <a id="apple" href="https://apps.apple.com/de/app/schichtblick-dienstplan/id6799117859">Im App Store laden</a><br>
+    <a id="play" href="https://play.google.com/store/apps/details?id=de.mlp3d.schichtblick">Bei Google Play laden</a>
   </p>
 
   <nav class="pages">
