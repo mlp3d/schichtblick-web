@@ -136,3 +136,8 @@ footer {
 footer a {
   color: inherit;
 }
+
+[dir="rtl"] ul {
+  padding-left: 0;
+  padding-right: 22px;
+}
